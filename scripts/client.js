@@ -1,3 +1,4 @@
+debugger;
 var socket = io.connect();
 
 function addMessage(msg, pseudo) {
@@ -23,7 +24,7 @@ function setPseudo() {
     }
 }
 
-socket.on('message', function(data) {
+socket.on('message', function (data) {
 	console.log('message! :' + data)
     addMessage(data['message'], data['pseudo']);
 });
@@ -35,6 +36,12 @@ socket.on('disconnected', function (data) {
 socket.on('gameStatus', function (data) {
     console.log('gameStatus :' + data);
     $('#gameStatus').html(data);
+})
+
+socket.on('game.opponentDisconnected', function (data) {
+    console.log('disconnected :' + data);
+    $('#gameStatus').html(data);
+	socket.emit('game.newGame');
 })
 
 $(function() {

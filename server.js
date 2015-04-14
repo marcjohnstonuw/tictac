@@ -5,6 +5,9 @@ var app = express();
 var redSock = null;
 var blueSock = null;
 
+var currentGames = {};
+var gamesIndex = 0;
+
 app.get('/', function (req, res) {
 	var options = {
 		root: __dirname + '/public/',
@@ -37,35 +40,46 @@ Sockets stuff
 
 var io = require('socket.io').listen(server);
 io.sockets.on('connection', function (socket) {
-	if (redSock === null) {
-		redSock = socket;
-		redSock.emit('gameStatus', 'Waiting');
-	} else if (blueSock === null) {
-		blueSock = socket;
-		redSock.emit('teamUpdate', {
-			myTeamName: 'Red',
-			opponentTeamName: 'Blue'
-		});
-		blueSock.emit('teamUpdate', {
-			myTeamName: 'Blue',
-			opponentTeamName: 'Red'
-		});
-		redSock.broadcast.emit('gameStatus', 'Red\'s turn');
-	} else {
-		//observer??
+	var myGameID;
+
+	for (gid in currentGames) {
+		if (!currentGames[gid].p2) {
+			socket.myGameID = myGameID = gid;
+			currentGames[gid].p2 = socket;
+			socket.emit('gameStatus', 'id : ' + socket.id + 'Joining game ' + gid);
+			console.log('alerting opponent :' + currentGames[gid].p1.id)
+			currentGames[gid].p1.emit('gameStatus', 'opponent joined');
+		}
 	}
+
+	if (!myGameID) {
+		socket.myGameID = gamesIndex;
+		currentGames[gamesIndex] = {
+			p1: socket
+		}
+		socket.emit('gameStatus', 'id : ' + socket.id + 'new game ' + gamesIndex + ', waiting for opponent');
+		gamesIndex += 1;
+	}
+
 	socket.on('message', function (message) {
 		console.log('server got a message :' + message);
         var data = { 'message' : message };
         socket.broadcast.emit('message', data);
 	});
 	socket.on('disconnect', function () {
-		socket.broadcast.emit('disconnected');
-		if (socket === redSock) {
-			console.log('red bailed');
-		} else if (socket === blueSock) {
-			console.log('blue bailed');
+		//socket.broadcast.emit('disconnected');
+		console.log('bailing out' + socket.id);
+
+		if (currentGames[socket.myGameID].p1.id === socket.id) {
+			currentGames[socket.myGameID].p1 = null;
+			if (currentGames[socket.myGameID].p2) {
+				currentGames[socket.myGameID].p2.emit('game.opponentDisconnect');
+			}
+		} else if (currentGames[socket.myGameID].p2.id === socket.id) {
+			currentGames[socket.myGameID].p2 = null;
+			if (currentGames[socket.myGameID].p1) {
+				currentGames[socket.myGameID].p1.emit('game.opponentDisconnect');
+			}
 		}
-		console.log('bailing out');
 	});
 });
