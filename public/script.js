@@ -1,39 +1,40 @@
+"use strict";
 var socket = io.connect();
-
 function addMessage(msg, pseudo) {
-    $("#chatEntries").append('<div class="message"><p>' + pseudo + ' : ' + msg + '</p></div>');
+  $("#chatEntries").append('<div class="message"><p>' + pseudo + ' : ' + msg + '</p></div>');
 }
-
 function sentMessage() {
-    if ($('#messageInput').val() != "") 
-    {
-        socket.emit('message', $('#messageInput').val());
-        addMessage($('#messageInput').val(), "Me", new Date().toISOString(), true);
-        $('#messageInput').val('');
-    }
+  if ($('#messageInput').val() != "") {
+    socket.emit('message', $('#messageInput').val());
+    addMessage($('#messageInput').val(), "Me", new Date().toISOString(), true);
+    $('#messageInput').val('');
+  }
 }
-
 function setPseudo() {
-    if ($("#pseudoInput").val() != "")
-    {
-        socket.emit('setPseudo', $("#pseudoInput").val());
-        $('#chatControls').show();
-        $('#pseudoInput').hide();
-        $('#pseudoSet').hide();
-    }
+  if ($("#pseudoInput").val() != "") {
+    socket.emit('setPseudo', $("#pseudoInput").val());
+    $('#chatControls').show();
+    $('#pseudoInput').hide();
+    $('#pseudoSet').hide();
+  }
 }
-
 socket.on('message', function(data) {
-	console.log('message! :' + data)
-    addMessage(data['message'], data['pseudo']);
+  console.log('message! :' + data);
+  addMessage(data['message'], data['pseudo']);
 });
-
-socket.on('disconnected', function (data) {
-	console.log('goodbye friend');
-})
-
+socket.on('disconnected', function(data) {
+  console.log('goodbye friend');
+});
+socket.on('gameStatus', function(data) {
+  console.log('gameStatus :' + data);
+  $('#gameStatus').html(data);
+});
 $(function() {
-    $("#chatControls").hide();
-    $("#pseudoSet").click(function() {setPseudo()});
-    $("#submit").click(function() {sentMessage();});
+  $("#chatControls").hide();
+  $("#pseudoSet").click(function() {
+    setPseudo();
+  });
+  $("#submit").click(function() {
+    sentMessage();
+  });
 });

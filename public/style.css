@@ -1,0 +1,11 @@
+.board {
+	height: 300px;
+}
+
+.square {
+	width: 33.3%;
+	height: 33.3%;
+	display: inline-block;
+	background-color: rgb(222, 222, 222);
+	border: 1px solid black;
+}
