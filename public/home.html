@@ -2,11 +2,14 @@
 	<head>
 		<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
 		<script type="text/javascript" src="https://cdn.socket.io/socket.io-1.3.4.js"></script>
-		<script type="text/javascript" src="script.js"></script>
+		<script type="text/javascript" src="traceur-runtime.js"></script>
+		<script type="text/javascript" src="out.js"></script>
 		<link rel="stylesheet" type="text/css" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
 		<link rel="stylesheet" type="text/css" href="style.css">
 	</head>
 	<body>
+		<input id="playerName" />
+		<button id="joinGame">Join</button>
 		<div class="container">
 			<div class="col-md-4 board">
 				<div class="square pull-left" x="0" y="0"></div>

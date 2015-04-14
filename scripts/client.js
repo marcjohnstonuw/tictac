@@ -1,4 +1,3 @@
-debugger;
 var socket = io.connect();
 
 function addMessage(msg, pseudo) {
@@ -14,13 +13,13 @@ function sentMessage() {
     }
 }
 
-function setPseudo() {
-    if ($("#pseudoInput").val() != "")
+function joinGame() {
+	console.log('clicked it baish');
+    if ($("#playerName").val() != "")
     {
-        socket.emit('setPseudo', $("#pseudoInput").val());
-        $('#chatControls').show();
-        $('#pseudoInput').hide();
-        $('#pseudoSet').hide();
+        socket.emit('joinGame', { name: $("#playerName").val() });
+        //$('#playerName').hide();
+        //$('#join').hide();
     }
 }
 
@@ -45,7 +44,7 @@ socket.on('game.opponentDisconnected', function (data) {
 })
 
 $(function() {
-    $("#chatControls").hide();
-    $("#pseudoSet").click(function() {setPseudo()});
+	console.log('hai');
+    $("#joinGame").click(function() {joinGame()});
     $("#submit").click(function() {sentMessage();});
 });
